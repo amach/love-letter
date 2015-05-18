@@ -1,22 +1,33 @@
 extends layout
 
 block content
-  p Full card list: #{fullCardList}
-  p Removed card is: #{startCard}
-  p
-  p Player 1 hand is:
-    = JSON.stringify(player1Hand)
-  p Player 2 hand is:
-    = JSON.stringify(player2Hand)
-  
-  h2 Player 1 cards
-  form(name='player1', action='', method='post')
-    input(type='hidden', name='player', value=1)
-    each cardNum, index in player1Hand
-      button(type='submit', name='card', value=index) #{cards[cardNum]}
-  
-  h2 Player 2 cards
-  form(name='player2', action='', method='post')
-    input(type='hidden', name='player', value=2)
-    each cardNum, index in player2Hand
-      button(type='submit', name='card', value=index) #{cards[cardNum]}
+    p Removed card is: #{startCard} (#{cards[startCard]})
+    p Remaining cards in deck:
+    ul
+        each value, key in fullCardList
+            if value !== 0
+                li #{cards[key]} (#{value})
+    p
+
+    h1 Current Player: #{currentPlayer}
+
+    if currentPlayer === 1
+        h2 Player 1 cards
+        form(name='player1', action='', method='post')
+            input(type='hidden', name='player', value=1)
+            if currentPlayer === 1
+                each cardNum, index in playerHands[0].sort()
+                    button(type='submit', name='card', value=index) #{cards[cardNum]} (#{cardNum})
+
+    if currentPlayer === 2
+        h2 Player 2 cards
+        form(name='player2', action='', method='post')
+            input(type='hidden', name='player', value=2)
+            each cardNum, index in playerHands[1].sort()
+                button(type='submit', name='card', value=index) #{cards[cardNum]} (#{cardNum})
+
+    h2 Move history:
+    p
+        each st in moveHistory
+            | #{st}
+            br

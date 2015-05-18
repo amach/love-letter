@@ -8,6 +8,17 @@ var fullCards = [1, 1, 1, 1, 1,
             5, 5,
             6, 7, 8];
 
+var cardCounts = {
+    1: 5,
+    2: 2,
+    3: 2,
+    4: 2,
+    5: 2,
+    6: 1,
+    7: 1,
+    8: 1
+};
+
 var cardNames = {
     1: 'Guard',
     2: 'Priest',
@@ -20,14 +31,20 @@ var cardNames = {
 };
 
 var removedCard;
-var player1Cards = [];
-var player2Cards = [];
+var playerCards = {};
 var numPlayers = 2;
 var currentPlayer = 1;
+var moveHistory = [];
 
 function grabRandomCard() {
     var randNum = Math.floor(Math.random() * fullCards.length);
-    return fullCards.splice(randNum, 1);
+    
+    if( fullCards.length > 0 ) {
+        cardCounts[fullCards[randNum]]--;
+        return fullCards.splice(randNum, 1);
+    } else {
+        return -1;
+    }
 }
 
 function resetGame() {
@@ -37,18 +54,35 @@ function resetGame() {
                 4, 4,
                 5, 5,
                 6, 7, 8];
+    cardCounts = {
+        1: 5,
+        2: 2,
+        3: 2,
+        4: 2,
+        5: 2,
+        6: 1,
+        7: 1,
+        8: 1
+    };
     removedCard = 0;
-    player1Cards = [];
-    player2Cards = [];
+    playerCards = {};
     currentPlayer = 1;
+    moveHistory = [];
 }
 
 function setupGame() {
     currentPlayer = 1;
     removedCard = grabRandomCard();
-    player1Cards.push(grabRandomCard());
-    player2Cards.push(grabRandomCard());
-    player1Cards.push(grabRandomCard());
+    moveHistory.push('Removed ' + removedCard + ' (' + cardNames[removedCard] + ')');
+    
+    for( var i = 0; i < numPlayers; i++ ) {
+        playerCards[i] = [];
+        playerCards[i].push(grabRandomCard());
+        moveHistory.push('Player ' + (i+1) + ' drew ' + playerCards[i][0] + ' (' + cardNames[playerCards[i][0]] + ')');
+    }
+    
+    playerCards[0].push(grabRandomCard());
+    moveHistory.push('Player 1 drew ' + playerCards[0][1] + ' (' + cardNames[playerCards[0][1]] + ')');
 }
 
 function updateCurrentPlayer() {
@@ -60,22 +94,21 @@ function updateCurrentPlayer() {
 }
 
 function playerTurn( playerId, cardIndex ) {
-    if( playerId === 1 ) {
-        if( cardIndex in player1Cards ) {
-            player1Cards.splice(cardIndex, 1);
-            updateCurrentPlayer();
-        }
-    } else if( playerId === 2 ) {
-        if( cardIndex in player2Cards ) {
-            player2Cards.splice(cardIndex, 1);
+    if( playerId-1 in playerCards ) {
+        var playerHand = playerCards[playerId-1];
+        
+        if( cardIndex in playerHand ) {
+            moveHistory.push('Player ' + playerId + ' played ' + playerHand[cardIndex] + ' (' + cardNames[playerHand[cardIndex]] + ')');
+            playerHand.splice(cardIndex, 1);
             updateCurrentPlayer();
         }
     }
 
-    if( currentPlayer === 1 ) {
-        player1Cards.push(grabRandomCard());
-    } else if( currentPlayer === 2 ) {
-        player2Cards.push(grabRandomCard());
+    // Next player draws a card to start their turn
+    var newCard = grabRandomCard();
+    if( newCard !== -1 ) {
+        playerCards[currentPlayer-1].push(newCard);
+        moveHistory.push('Player ' + currentPlayer + ' drew ' + playerCards[currentPlayer-1][1] + ' (' + cardNames[playerCards[currentPlayer-1][1]] + ')');
     }
 }
 
@@ -87,13 +120,15 @@ router.get('/', function(req, res, next) {
 router.get('/game', function(req, res, next) {
     resetGame();
     setupGame();
+    
     res.render('game', { 
         title: 'Love Letter', 
-        fullCardList: JSON.stringify(fullCards),
-        startCard: cardNames[removedCard],
+        fullCardList: cardCounts,
+        startCard: removedCard,
         cards: cardNames,
-        player1Hand: player1Cards,
-        player2Hand: player2Cards
+        playerHands: playerCards,
+        currentPlayer: currentPlayer,
+        moveHistory: moveHistory
     });
 });
 
@@ -103,14 +138,15 @@ router.post('/game', function(req, res, next) {
     if( parseInt(req.body.player, 10) === currentPlayer ) {
         playerTurn( currentPlayer, parseInt(req.body.card, 10) );
     }
-
+    
     res.render('game', { 
         title: 'Love Letter', 
-        fullCardList: JSON.stringify(fullCards),
-        startCard: cardNames[removedCard],
+        fullCardList: cardCounts,
+        startCard: removedCard,
         cards: cardNames,
-        player1Hand: player1Cards,
-        player2Hand: player2Cards
+        playerHands: playerCards,
+        currentPlayer: currentPlayer,
+        moveHistory: moveHistory
     });
 });
 
