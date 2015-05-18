@@ -22,6 +22,8 @@ var card_names = {
 var removed_card;
 var player1_cards = [];
 var player2_cards = [];
+var number_of_players = 2;
+var current_player = 1;
 
 function grabRandomCard() {
   var rand_num = Math.floor(Math.random() * full_cards.length);
@@ -38,13 +40,43 @@ function resetGame() {
   removed_card = 0;
   player1_cards = [];
   player2_cards = [];
+  current_player = 1;
 }
 
 function setupGame() {
+  current_player = 1;
   removed_card = grabRandomCard();
   player1_cards.push(grabRandomCard());
   player2_cards.push(grabRandomCard());
   player1_cards.push(grabRandomCard());
+}
+
+function updateCurrentPlayer() {
+  current_player++;
+  
+  if( current_player > number_of_players ) {
+    current_player = 1;
+  }
+}
+
+function playerTurn( playerId, card_index ) {
+  if( playerId === 1 ) {
+    if( card_index in player1_cards ) {
+      player1_cards.splice(card_index, 1);
+      updateCurrentPlayer();
+    }
+  } else if( playerId === 2 ) {
+    if( card_index in player2_cards ) {
+      player2_cards.splice(card_index, 1);
+      updateCurrentPlayer();
+    }
+  }
+  
+  if( current_player === 1 ) {
+    player1_cards.push(grabRandomCard());
+  } else if( current_player === 2 ) {
+    player2_cards.push(grabRandomCard());
+  }
 }
 
 /* GET home page. */
@@ -68,11 +100,9 @@ router.get('/game', function(req, res, next) {
 router.post('/game', function(req, res, next) {
   console.log(req.body);
   
-  if( req.body.player === '1' ) {
-    
-  } else if( req.body.player === '2' ) {
-    
-  } 
+  if( parseInt(req.body.player, 10) === current_player ) {
+    playerTurn( current_player, parseInt(req.body.card, 10) );
+  }
   
   res.render('game', { 
     title: 'Love Letter', 

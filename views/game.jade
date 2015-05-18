@@ -13,10 +13,10 @@ block content
   form(name='player1', action='', method='post')
     input(type='hidden', name='player', value=1)
     each card_num, index in player1_hand
-      input(type='submit', name=index, value='#{cards[card_num]}')
+      button(type='submit', name='card', value=index) #{cards[card_num]}
   
   h2 Player 2 cards
   form(name='player2', action='', method='post')
     input(type='hidden', name='player', value=2)
     each card_num, index in player2_hand
-      input(type='submit', name=index, value='#{cards[card_num]}')
+      button(type='submit', name='card', value=index) #{cards[card_num]}
