@@ -5,18 +5,18 @@ block content
   p Removed card is: #{startCard}
   p
   p Player 1 hand is:
-    = JSON.stringify(player1_hand)
+    = JSON.stringify(player1Hand)
   p Player 2 hand is:
-    = JSON.stringify(player2_hand)
+    = JSON.stringify(player2Hand)
   
   h2 Player 1 cards
   form(name='player1', action='', method='post')
     input(type='hidden', name='player', value=1)
-    each card_num, index in player1_hand
-      button(type='submit', name='card', value=index) #{cards[card_num]}
+    each cardNum, index in player1Hand
+      button(type='submit', name='card', value=index) #{cards[cardNum]}
   
   h2 Player 2 cards
   form(name='player2', action='', method='post')
     input(type='hidden', name='player', value=2)
-    each card_num, index in player2_hand
-      button(type='submit', name='card', value=index) #{cards[card_num]}
+    each cardNum, index in player2Hand
+      button(type='submit', name='card', value=index) #{cards[cardNum]}

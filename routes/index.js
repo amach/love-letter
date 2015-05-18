@@ -1,117 +1,117 @@
 var express = require('express');
 var router = express.Router();
 
-var full_cards = [1, 1, 1, 1, 1,
+var fullCards = [1, 1, 1, 1, 1,
             2, 2,
             3, 3,
             4, 4,
             5, 5,
             6, 7, 8];
 
-var card_names = {
-  1: 'Guard',
-  2: 'Priest',
-  3: 'Baron',
-  4: 'Handmaid',
-  5: 'Prince',
-  6: 'King',
-  7: 'Countess',
-  8: 'Princess'
+var cardNames = {
+    1: 'Guard',
+    2: 'Priest',
+    3: 'Baron',
+    4: 'Handmaid',
+    5: 'Prince',
+    6: 'King',
+    7: 'Countess',
+    8: 'Princess'
 };
 
-var removed_card;
-var player1_cards = [];
-var player2_cards = [];
-var number_of_players = 2;
-var current_player = 1;
+var removedCard;
+var player1Cards = [];
+var player2Cards = [];
+var numPlayers = 2;
+var currentPlayer = 1;
 
 function grabRandomCard() {
-  var rand_num = Math.floor(Math.random() * full_cards.length);
-  return full_cards.splice(rand_num, 1);
+    var randNum = Math.floor(Math.random() * fullCards.length);
+    return fullCards.splice(randNum, 1);
 }
 
 function resetGame() {
-  full_cards = [1, 1, 1, 1, 1,
-            2, 2,
-            3, 3,
-            4, 4,
-            5, 5,
-            6, 7, 8];
-  removed_card = 0;
-  player1_cards = [];
-  player2_cards = [];
-  current_player = 1;
+    fullCards = [1, 1, 1, 1, 1,
+                2, 2,
+                3, 3,
+                4, 4,
+                5, 5,
+                6, 7, 8];
+    removedCard = 0;
+    player1Cards = [];
+    player2Cards = [];
+    currentPlayer = 1;
 }
 
 function setupGame() {
-  current_player = 1;
-  removed_card = grabRandomCard();
-  player1_cards.push(grabRandomCard());
-  player2_cards.push(grabRandomCard());
-  player1_cards.push(grabRandomCard());
+    currentPlayer = 1;
+    removedCard = grabRandomCard();
+    player1Cards.push(grabRandomCard());
+    player2Cards.push(grabRandomCard());
+    player1Cards.push(grabRandomCard());
 }
 
 function updateCurrentPlayer() {
-  current_player++;
+    currentPlayer++;
   
-  if( current_player > number_of_players ) {
-    current_player = 1;
+  if( currentPlayer > numPlayers ) {
+      currentPlayer = 1;
   }
 }
 
-function playerTurn( playerId, card_index ) {
-  if( playerId === 1 ) {
-    if( card_index in player1_cards ) {
-      player1_cards.splice(card_index, 1);
-      updateCurrentPlayer();
+function playerTurn( playerId, cardIndex ) {
+    if( playerId === 1 ) {
+        if( cardIndex in player1Cards ) {
+            player1Cards.splice(cardIndex, 1);
+            updateCurrentPlayer();
+        }
+    } else if( playerId === 2 ) {
+        if( cardIndex in player2Cards ) {
+            player2Cards.splice(cardIndex, 1);
+            updateCurrentPlayer();
+        }
     }
-  } else if( playerId === 2 ) {
-    if( card_index in player2_cards ) {
-      player2_cards.splice(card_index, 1);
-      updateCurrentPlayer();
+
+    if( currentPlayer === 1 ) {
+        player1Cards.push(grabRandomCard());
+    } else if( currentPlayer === 2 ) {
+        player2Cards.push(grabRandomCard());
     }
-  }
-  
-  if( current_player === 1 ) {
-    player1_cards.push(grabRandomCard());
-  } else if( current_player === 2 ) {
-    player2_cards.push(grabRandomCard());
-  }
 }
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('overview', { title: 'Love Letter', nav_link: '/game' } );
+    res.render('overview', { title: 'Love Letter', nav_link: '/game' } );
 });
 
 router.get('/game', function(req, res, next) {
-  resetGame();
-  setupGame();
-  res.render('game', { 
-    title: 'Love Letter', 
-    fullCardList: JSON.stringify(full_cards),
-    startCard: card_names[removed_card],
-    cards: card_names,
-    player1_hand: player1_cards,
-    player2_hand: player2_cards
-  });
+    resetGame();
+    setupGame();
+    res.render('game', { 
+        title: 'Love Letter', 
+        fullCardList: JSON.stringify(fullCards),
+        startCard: cardNames[removedCard],
+        cards: cardNames,
+        player1Hand: player1Cards,
+        player2Hand: player2Cards
+    });
 });
 
 router.post('/game', function(req, res, next) {
-  console.log(req.body);
-  
-  if( parseInt(req.body.player, 10) === current_player ) {
-    playerTurn( current_player, parseInt(req.body.card, 10) );
-  }
-  
-  res.render('game', { 
-    title: 'Love Letter', 
-    fullCardList: JSON.stringify(full_cards),
-    startCard: card_names[removed_card],
-    cards: card_names,
-    player1_hand: player1_cards,
-    player2_hand: player2_cards
-  });
+    console.log(req.body);
+
+    if( parseInt(req.body.player, 10) === currentPlayer ) {
+        playerTurn( currentPlayer, parseInt(req.body.card, 10) );
+    }
+
+    res.render('game', { 
+        title: 'Love Letter', 
+        fullCardList: JSON.stringify(fullCards),
+        startCard: cardNames[removedCard],
+        cards: cardNames,
+        player1Hand: player1Cards,
+        player2Hand: player2Cards
+    });
 });
 
 module.exports = router;
