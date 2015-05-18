@@ -1,0 +1,22 @@
+extends layout
+
+block content
+  p Full card list: #{fullCardList}
+  p Removed card is: #{startCard}
+  p
+  p Player 1 hand is:
+    = JSON.stringify(player1_hand)
+  p Player 2 hand is:
+    = JSON.stringify(player2_hand)
+  
+  h2 Player 1 cards
+  form(name='player1', action='', method='post')
+    input(type='hidden', name='player', value=1)
+    each card_num, index in player1_hand
+      input(type='submit', name=index, value='#{cards[card_num]}')
+  
+  h2 Player 2 cards
+  form(name='player2', action='', method='post')
+    input(type='hidden', name='player', value=2)
+    each card_num, index in player2_hand
+      input(type='submit', name=index, value='#{cards[card_num]}')

@@ -1,0 +1,29 @@
+extends layout
+
+block content
+  h1= title
+  p Welcome to #{title}!
+  h3 Gameplay:
+  p The object of the game is to win tokens of affection. A token of affection is awarded to the player with the highest ranked card in their hand at the end of each round. A round ends if all players except one are eliminated, or when the deck runs out.
+  h3 Card List:
+  ol
+    li Guard (5): Guess the card in a player's hand (except for Guards!)
+    li Priest (2): Look at a player's hand
+    li Baron (2): Compare hands: lower card number is out
+    li Handmaid (2): Protection from card effects until next turn
+    li Prince (2): One player discards his or her hand (and draws a new card if not eliminated)
+    li King (1): Trade hands with another player
+    li Countess (1): Must be discarded if caught with King or Prince
+    li Princess (1): Lose if this card is discarded
+  h3 Setup:
+  ol
+    li Shuffle the 16 cards to form a face-down draw deck.
+    li Remove the top card of the deck from the game without looking at it.
+    li If playing a two-player game, take 3 more cards from the top of the deck and place them to the side, face up. (They will not be used during this round.)
+  h3 Taking a Turn:
+  ol
+    li Draw the top card of the deck and add it to your hand.
+    li Choose one of the two cards in your hand and discard it face up in front of you.
+    li Apply any effect on the card you discarded.
+  p
+    a(href="#{nav_link}") Let's get started!
